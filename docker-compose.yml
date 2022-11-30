@@ -26,14 +26,14 @@
 # 15. Redis-Commander   8082
 # 16. Elasticsearch     9200, 9300
 # 17. Kibana            5601
-# 18. Keycloak          8085:8080
+# 18. Keycloak          8084:8080
 
 # DEVOPS TOOLS
 # ============
-# 1.  Nginx               8080, 443
-# 2.  Jenkins Controller  8083:8080, 50001:50000
-# 3.  Jenkins Agent       22
-
+# 1.  Nginx                         8080, 443
+# 2.  Jenkins Controller            8083:8080, 50001:50000
+# 3.  Jenkins Agent                 22
+# 4.  Atlassian Bamboo              8085:8085
 
 version: '3'
 
@@ -359,10 +359,11 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=P4ssword2050
     ports:
-      - 8085:8080
+      - 8084:8080
     networks:
       static-network:
         ipv4_address: 172.20.0.19
+
 
   # 1. Nginx
   nginx:
@@ -410,7 +411,21 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.53
-
+  # 4. Atlassian Bamboo
+  bamboo-server:
+    image: atlassian/bamboo-server:latest
+    container_name: bamboo-server
+    restart: unless-stopped
+    init: true
+    volumes:
+      - ./bamboo:/var/atlassian/application-data/bamboo
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 54663:54663
+      - 8085:8085
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.54
 
 networks:
   static-network:

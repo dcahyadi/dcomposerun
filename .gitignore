@@ -1,5 +1,6 @@
 # ignore autogenerate container's config directory
 
+bamboo/
 cassandra/
 couchbase/
 couchdb/
