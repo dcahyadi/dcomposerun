@@ -1,0 +1,418 @@
+# Run this after "docker-compose pull", before "docker-compose up -d" on docker directory
+# PostgreSQL:
+# sudo chown -R 5050:5050 ./pgadmin/data
+# RabbitMq:
+# sudo chown -R systemd-network:root ./rabbitmq/log/
+# sudo chown -R 100:101 ./rabbitmq/etc/
+# Elasticsearch:
+# sudo chmod -R 775 ./elasticsearch/
+
+# DEVELOPMENT TOOLS
+# =================
+# 1.  Portainer CE      9000
+# 2.  MySQL 5.7         3306
+# 3.  MySQL Workbench   3000
+# 4.  PostgreSQL        5432
+# 5.  PgAdmin4          5050
+# 6.  IBM Db2           50000
+# 7.  IBM Db2 Console   11081
+# 8.  RabbitMQ          5672, 15672
+# 9.  MongoDB           27017
+# 10. Mongo-Express     8081
+# 11. Cassandra         7000, 7001, 7199, 9042, 9160
+# 12. CouchDB           5984
+# 13. Couchbase         8091-8097, 11210-11211
+# 14. Redis             6379
+# 15. Redis-Commander   8082
+# 16. Elasticsearch     9200, 9300
+# 17. Kibana            5601
+# 18. Keycloack         8085:8080
+
+# DEVOPS TOOLS
+# ============
+# 1.  Nginx               8080, 443
+# 2.  Jenkins Controller  8083:8080, 50001:50000
+# 3.  Jenkins Agent       22
+
+
+version: '3'
+
+services:
+  # 1. Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - 9000:9000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.2
+  # 2. MySQL
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: unless-stopped
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: P4ssword2050
+    ports:
+      - 3306:3306
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.3
+  # 3. MySQL Workbench
+  mysql-workbench:
+    image: lscr.io/linuxserver/mysql-workbench
+    container_name: mysql-workbench
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jakarta
+    volumes:
+      - /path/to/config:/config
+    ports:
+      - 3000:3000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.4
+    cap_add:
+      - IPC_LOCK
+  # 4. PostgreSQL
+  postgresql:
+    image: postgres:15.1
+    container_name: postgresql
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=P4ssword2050
+      - POSTGRES_DB=testdb
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.5
+  # 5. pgAdmin 4
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+      - PGADMIN_DEFAULT_PASSWORD=P4ssword2050
+    user: 5050:5050 # chown -R 5050:5050 ./pgadmin/data
+    volumes:
+      - ./pgadmin/data:/var/lib/pgadmin 
+    ports:
+      - 5050:80
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.6
+  # 6. IBM Db2
+  db2:
+    image: ibmcom/db2
+    container_name: db2
+    restart: unless-stopped
+    environment:
+      - LICENSE=accept
+      - DB2INSTANCE=db2inst1
+      - DB2INST1_PASSWORD=P4ssword2050
+      - DBNAME=testdb
+    volumes:
+      - ./db2/data:/database
+    ports:
+      - 50000:50000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.7
+  # 7. IBM Db2 Data Management Console
+  db2-console:
+    image: ibmcom/db2console
+    container_name: db2console
+    restart: unless-stopped
+    environment:
+      - LICENSE=accept
+      - ADMIN_NAME=admin
+      - ADMIN_PASSWORD=P4ssword2050
+      - MIGRATION=false
+      - REPO_HOST=172.20.0.7
+      - REPO_PORT=50000
+      - REPO_DATABASE=testdb
+      - REPO_USERNAME=db2inst1
+      - REPO_PASSWORD=P4ssword2050
+    volumes:
+      - ./db2console/mnt:/mnt
+      - ./db2console/certs:/opt/ibm-datasrvrmgr/certs
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 11081:8443
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.8
+  # 8. RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=P4ssword2050
+    volumes:
+      # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins 
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.9
+  # 9. MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: P4ssword2050
+    volumes:
+      - ./mongo/data:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.10
+  # 10. Mongo-Express
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_USERNAME: root
+      ME_CONFIG_MONGODB_PASSWORD: P4ssword2050
+      # ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: P4ssword2050
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: P4ssword2050
+      ME_CONFIG_MONGODB_URL: mongodb://root:P4ssword2050@mongodb:27017/
+    depends_on:
+      - mongodb
+    ports:
+      - 8081:8081
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.11
+  # 11. Cassandra
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    restart: unless-stopped
+    environment:
+      - "MAX_HEAP_SIZE=256M"
+      - "HEAP_NEWSIZE=256M"
+      - CASSANDRA_CLUSTER_NAME=cass-cluster 
+    volumes:
+      - ./cassandra/data:/var/lib/cassandra
+    ports:
+      - 7000:7000 # Internode cluster communication
+      - 7001:7001 # TLS Internode cluster communication
+      - 7199:7199 # JMX monitoring
+      - 9042:9042 # CQL native protocol clients
+      - 9160:9160 # Thrift client API
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.12
+  # 12. CouchDB
+  couchdb:
+    image: couchdb:latest
+    container_name: couchdb
+    restart: unless-stopped
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=P4ssword2050
+    volumes:
+        - ./couchdb/data:/opt/couchdb/data
+        - ./couchdb/etc:/opt/couchdb/etc/local.d
+    ports:
+      - 5984:5984
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.13
+  # 13. Couchbase Community
+  couchbase:
+    image: couchbase:community
+    container_name: couchbase
+    restart: unless-stopped
+    environment:
+      - CLUSTER_NAME=couchbase-cluster
+      - COUCHBASE_ADMINISTRATOR_USERNAME=Administrator
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=P4ssword2050
+      - COUCHBASE_BUCKET=projects
+      - COUCHBASE_BUCKET_RAMSIZE=256
+      - COUCHBASE_RBAC_USERNAME=admin
+      - COUCHBASE_RBAC_PASSWORD=P4ssword2050
+      - COUCHBASE_RBAC_NAME=admin
+      - COUCHBASE_RAM_SIZE=2048
+      - COUCHBASE_INDEX_RAM_SIZE=256
+    volumes:
+        - ./couchbase/data:/opt/couchbase/var
+    ports:
+      - 8091-8097:8091-8097
+      - 11210-11211:11210-11211
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.14
+  # 14. Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --requirepass P4ssword2050 --loglevel warning
+    volumes:
+      - ./redis/cache:/data
+    ports:
+      - 6379:6379
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.15
+  # 15. Redis-Commander
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    hostname: redis-commander
+    restart: unless-stopped
+    environment:
+      - REDIS_HOSTS=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=redis:6379
+      - REDIS_PASSWORD=P4ssword2050
+      - HTTP_USER=root
+      - HTTP_PASSWORD=P4ssword2050
+    ports:
+      - 8082:8081
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.16
+  # 16. Elasticsearch (single-node)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elasticpassword
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.17
+  # 17. Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.3.2
+    container_name: kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+    ports:
+      - 5601:5601
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.18
+  # 18. Keycloack
+  keycloack:
+    image: quay.io/keycloak/keycloak:20.0.1
+    container_name: keycloack
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - 8085:8080
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.19
+
+  # 1. Nginx
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/html/:/usr/share/nginx/html/
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/ssl/
+    ports:
+      - 8080:80
+      - 443:443  
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.51
+  # 2. Jenkins controller
+  jenkins:
+    image: jenkins/jenkins:lts-jdk11
+    container_name: jenkins
+    restart: unless-stopped
+    privileged: true
+    user: root
+    volumes:
+      - ./jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/local/bin/docker
+    ports:
+      - 8083:8080
+      - 50001:50000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.52
+  # 3. Jenkins Agent
+  jenkins-agent:
+    image: jenkins/ssh-agent:jdk11
+    container_name: jenkins-agent
+    restart: unless-stopped
+    privileged: true
+    user: root
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa ABCDabcd12345 cahyadi@lugito-zettatech.com
+    expose:
+      - 22
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.53
+
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

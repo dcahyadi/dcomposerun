@@ -1,0 +1,16 @@
+# ignore autogenerate container's config directory
+
+cassandra/
+couchbase/
+couchdb/
+db2/
+elasticsearch/
+jenkins/
+mongo/
+mysql/
+nginx/
+pgadmin/
+portainer-data/
+postgres/
+rabbitmq/
+redis/
