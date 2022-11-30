@@ -26,7 +26,7 @@
 # 15. Redis-Commander   8082
 # 16. Elasticsearch     9200, 9300
 # 17. Kibana            5601
-# 18. Keycloack         8085:8080
+# 18. Keycloak          8085:8080
 
 # DEVOPS TOOLS
 # ============
@@ -349,14 +349,15 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.18
-  # 18. Keycloack
+  # 18. Keycloak
   keycloack:
-    image: quay.io/keycloak/keycloak:20.0.1
-    container_name: keycloack
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
     restart: unless-stopped
+    command: start-dev
     environment:
       - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KEYCLOAK_ADMIN_PASSWORD=P4ssword2050
     ports:
       - 8085:8080
     networks:
