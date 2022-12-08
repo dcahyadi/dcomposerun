@@ -9,31 +9,36 @@
 
 # DEVELOPMENT TOOLS
 # =================
-# 1.  Portainer CE      9000
-# 2.  MySQL 5.7         3306
-# 3.  MySQL Workbench   3000
-# 4.  PostgreSQL        5432
-# 5.  PgAdmin4          5050
-# 6.  IBM Db2           50000
-# 7.  IBM Db2 Console   11081
-# 8.  RabbitMQ          5672, 15672
-# 9.  MongoDB           27017
-# 10. Mongo-Express     8081
-# 11. Cassandra         7000, 7001, 7199, 9042, 9160
-# 12. CouchDB           5984
-# 13. Couchbase         8091-8097, 11210-11211
-# 14. Redis             6379
-# 15. Redis-Commander   8082
-# 16. Elasticsearch     9200, 9300
-# 17. Kibana            5601
-# 18. Keycloak          8084:8080
+# 1.  Portainer CE        9000
+# 2.  MySQL 5.7           3306
+# 3.  MySQL Workbench     3000
+# 4.  PostgreSQL          5432
+# 5.  PgAdmin4            5050
+# 6.  IBM Db2             50000
+# 7.  IBM Db2 Console     11081
+# 8.  MongoDB             27017
+# 9.  Mongo-Express       8081
+# 10. Cassandra           7000, 7001, 7199, 9042, 9160
+# 11. CouchDB             5984
+# 12. Couchbase           8091-8097, 11210-11211
+# 13. Redis               6379
+# 14. Redis-Commander     8082
+# 15. Elasticsearch       9200, 9300
+# 16. Kibana              5601
+# 17. RabbitMQ            5672, 15672
+# 18. Keycloak            8084:8080
 
 # DEVOPS TOOLS
 # ============
-# 1.  Nginx                         8080, 443
-# 2.  Jenkins Controller            8083:8080, 50001:50000
-# 3.  Jenkins Agent                 22
-# 4.  Atlassian Bamboo              8085:8085
+# 1.  Nginx               8080, 443
+# 2.  Jenkins Controller  8083:8080, 50001:50000
+# 3.  Jenkins Agent       22
+# 4.  Atlassian Bamboo    8085:8085
+
+# SECURITY TOOLS
+# ==============
+# 1.  OWASP ZAP           8080, 443
+
 
 version: '3'
 
@@ -161,25 +166,7 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.8
-  # 8. RabbitMQ
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
-    restart: unless-stopped
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=P4ssword2050
-    volumes:
-      # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins 
-      - ./rabbitmq/data/:/var/lib/rabbitmq/
-      - ./rabbitmq/log/:/var/log/rabbitmq
-    ports:
-      - 5672:5672
-      - 15672:15672
-    networks:
-      static-network:
-        ipv4_address: 172.20.0.9
-  # 9. MongoDB
+  # 8. MongoDB
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -193,8 +180,8 @@ services:
       - 27017:27017
     networks:
       static-network:
-        ipv4_address: 172.20.0.10
-  # 10. Mongo-Express
+        ipv4_address: 172.20.0.9
+  # 9. Mongo-Express
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
@@ -215,8 +202,8 @@ services:
       - 8081:8081
     networks:
       static-network:
-        ipv4_address: 172.20.0.11
-  # 11. Cassandra
+        ipv4_address: 172.20.0.10
+  # 10. Cassandra
   cassandra:
     image: cassandra:latest
     container_name: cassandra
@@ -235,8 +222,8 @@ services:
       - 9160:9160 # Thrift client API
     networks:
       static-network:
-        ipv4_address: 172.20.0.12
-  # 12. CouchDB
+        ipv4_address: 172.20.0.11
+  # 11. CouchDB
   couchdb:
     image: couchdb:latest
     container_name: couchdb
@@ -251,8 +238,8 @@ services:
       - 5984:5984
     networks:
       static-network:
-        ipv4_address: 172.20.0.13
-  # 13. Couchbase Community
+        ipv4_address: 172.20.0.12
+  # 12. Couchbase Community
   couchbase:
     image: couchbase:community
     container_name: couchbase
@@ -275,8 +262,8 @@ services:
       - 11210-11211:11210-11211
     networks:
       static-network:
-        ipv4_address: 172.20.0.14
-  # 14. Redis
+        ipv4_address: 172.20.0.13
+  # 13. Redis
   redis:
     image: redis:latest
     container_name: redis
@@ -289,8 +276,8 @@ services:
       - 6379:6379
     networks:
       static-network:
-        ipv4_address: 172.20.0.15
-  # 15. Redis-Commander
+        ipv4_address: 172.20.0.14
+  # 14. Redis-Commander
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: redis-commander
@@ -307,8 +294,8 @@ services:
       - 8082:8081
     networks:
       static-network:
-        ipv4_address: 172.20.0.16
-  # 16. Elasticsearch (single-node)
+        ipv4_address: 172.20.0.15
+  # 15. Elasticsearch (single-node)
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
     container_name: elasticsearch
@@ -333,8 +320,8 @@ services:
       - 9300:9300
     networks:
       static-network:
-        ipv4_address: 172.20.0.17
-  # 17. Kibana
+        ipv4_address: 172.20.0.16
+  # 16. Kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.2
     container_name: kibana
@@ -346,6 +333,24 @@ services:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
     ports:
       - 5601:5601
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.17
+  # 17. RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=P4ssword2050
+    volumes:
+      # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
     networks:
       static-network:
         ipv4_address: 172.20.0.18
