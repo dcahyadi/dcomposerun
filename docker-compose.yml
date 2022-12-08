@@ -37,7 +37,7 @@
 
 # SECURITY TOOLS
 # ==============
-# 1.  OWASP ZAP           8080, 443
+# 1.  OWASP ZAP           8180:8080, 8190:8090
 
 
 version: '3'
@@ -431,6 +431,19 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.54
+
+  # 1. OWASP Zed Attack Proxy (ZAP)
+  zaproxy:
+    image: owasp/zap2docker-stable
+    container_name: zaproxy
+    restart: unless-stopped
+    command: zap-webswing.sh
+    ports:
+      - 8180:8080
+      - 8190:8090
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.101
 
 networks:
   static-network:
