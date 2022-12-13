@@ -12,42 +12,43 @@ Purpose of this project is to accelarate preparation of sharing resource server 
 ### Development Tools
 | No    | Tools                 | Purpose   | Website   | Port Mapping  |
 | --    | -----                 | -------   | -------   | ------------  |
-| 1     | Portainer CE          | GUI multi container management platform | https://www.portainer.io/ | 9000 |
-| 2     | MySQL 5.7             | Open source RDBMS | https://www.mysql.com/ | 3306 |
-| 3     | MySQL Workbench       | Unified visual tool for database | https://www.mysql.com/products/workbench/ | 3000 |
-| 4     | PostgreSQL 15         | Open source RDBMS | https://www.postgresql.org/ | 5432 |
+| 1     | Portainer CE          | GUI multi container management platform | https://www.portainer.io | 9000 |
+| 2     | MySQL 5.7             | Open source RDBMS | https://www.mysql.com | 3306 |
+| 3     | MySQL Workbench       | Unified visual tool for database | https://www.mysql.com/products/workbench | 3000 |
+| 4     | PostgreSQL 15         | Open source RDBMS | https://www.postgresql.org | 5432 |
 | 5     | PgAdmin4              | GUI Database Administration for PostgreSQL | https://www.pgadmin.org | 5050 |
 | 6     | IBM Db2               | Data managment products developed by IBM | https://www.ibm.com/id-en/products/db2 | 50000 |
 | 7     | IBM Db2 Console       | Browser-based console to administer, monitor and manage IBM Db2 | https://www.ibm.com/id-en/products/db2-data-management-console | 11081 |
-| 8     | MongoDB               | Document oriented database program | https://www.mongodb.com/ | 27017 |
+| 8     | MongoDB               | Document oriented database program | https://www.mongodb.com | 27017 |
 | 9     | Mongo-Express         | Web-based MongoDB admin interface | https://github.com/mongo-express/mongo-express | 8081 |
-| 10    | Cassandra             | Open source NoSQL distributed database system | https://cassandra.apache.org/ | 7000, 7001, 7199, 9042, 9160 |
-| 11    | CouchDB               | Open source document oriented NoSQL database | https://couchdb.apache.org/ | 5984 |
-| 12    | Couchbase             | Distributed NoSQL cloud database | https://www.couchbase.com/ | 8091-8097, 11210-11211 |
-| 13    | Redis                 | In-memory data structure store | https://redis.io/ | 6379 |
+| 10    | Cassandra             | Open source NoSQL distributed database system | https://cassandra.apache.org | 7000, 7001, 7199, 9042, 9160 |
+| 11    | CouchDB               | Open source document oriented NoSQL database | https://couchdb.apache.org | 5984 |
+| 12    | Couchbase             | Distributed NoSQL cloud database | https://www.couchbase.com | 8091-8097, 11210-11211 |
+| 13    | Redis                 | In-memory data structure store | https://redis.io | 6379 |
 | 14    | Redis-Commander       | Redis web-based management tool | https://www.npmjs.com/package/redis-commander | 8082 |
-| 15    | Elasticsearch         | Search engine and analytic solution based on Lucene library | https://www.elastic.co/ | 9200, 9300 |
-| 16    | Kibana                | Data visualization dashboard for Elasticsearch | https://www.elastic.co/kibana/ | 5601 |
-| 17    | RabbitMQ              | Open source message-broker that implemented AMQP | https://www.rabbitmq.com/ | 5672, 15672 |
-| 18    | Keycloak              | Open source SSO software with Identity and Access Management | https://www.keycloak.org/ | 8084:8080 |
+| 15    | Elasticsearch         | Search engine and analytic solution based on Lucene library | https://www.elastic.co | 9200, 9300 |
+| 16    | Kibana                | Data visualization dashboard for Elasticsearch | https://www.elastic.co/kibana | 5601 |
+| 17    | RabbitMQ              | Open source message-broker that implemented AMQP | https://www.rabbitmq.com | 5672, 15672 |
+| 18    | Keycloak              | Open source SSO software with Identity and Access Management | https://www.keycloak.org | 8084:8080 |
 
 ### DevOps Tools
 | No    | Tools                 | Purpose   | Website   | Port Mapping  |
 | --    | -----                 | -------   | -------   | ------------  |
-| 1     | Nginx                 | Web Server that can be used for reverse proxy, load balancer, HTTP cache, media streaming | https://www.nginx.com/ | 8080, 443 |
-| 2     | Jenkins Controller    | Node for Jenkins Server (an automated server which related to build, test, and deploy code) | https://www.jenkins.io/ | 8083:8080, 50001:50000 |
-| 3     | Jenkins Agent         | Node to run build tasks that are scheduled by the Jenkins Controller | https://www.jenkins.io/ | 22 |
+| 1     | Nginx                 | Web Server that can be used for reverse proxy, load balancer, HTTP cache, media streaming | https://www.nginx.com | 8080, 443 |
+| 2     | Jenkins Controller    | Node for Jenkins Server (an automated server which related to build, test, and deploy code) | https://www.jenkins.io | 8083:8080, 50001:50000 |
+| 3     | Jenkins Agent         | Node to run build tasks that are scheduled by the Jenkins Controller | https://www.jenkins.io | 22 |
 | 4     | Atlassian Bamboo      | CI/CD tool, used for automated build, test, and deploy | https://www.atlassian.com/software/bamboo | 8085:8085 |
+| 5     | Sonarqube             | Code Quality Assurance tool to inspect code quality and security | https://www.sonarqube.org | 9002:9000 |
 
 ### Security Tools
 | No    | Tools                   | Purpose   | Website   | Port Mapping  |
 | --    | -----                   | -------   | -------   | ------------  |
-| 1     | Zed Attack Proxy (ZAP)  | Open source web application security scanner | https://www.zaproxy.org/ | 8180:8080, 8190:8090 |
+| 1     | Zed Attack Proxy (ZAP)  | Open source web application security scanner | https://www.zaproxy.org | 8180:8080, 8190:8090 |
 
 ### Testing Tools
 | No    | Tools                 | Purpose   | Website   | Port Mapping  |
 | --    | -----                 | -------   | -------   | ------------  |
-| 1     | Selenium              | Open source for automation testing across browser for web applications | https://www.selenium.dev/ | 4442, 4443, 4444 |
+| 1     | Selenium              | Open source for automation testing across browser for web applications | https://www.selenium.dev | 4442, 4443, 4444 |
 <br />
 
 ## Prerequisites

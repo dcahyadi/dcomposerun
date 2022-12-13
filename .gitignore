@@ -16,3 +16,4 @@ portainer-data/
 postgres/
 rabbitmq/
 redis/
+sonarqube/
