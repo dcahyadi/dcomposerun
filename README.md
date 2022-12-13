@@ -43,6 +43,11 @@ Purpose of this project is to accelarate preparation of sharing resource server 
 | No    | Tools                   | Purpose   | Website   | Port Mapping  |
 | --    | -----                   | -------   | -------   | ------------  |
 | 1     | Zed Attack Proxy (ZAP)  | Open source web application security scanner | https://www.zaproxy.org/ | 8180:8080, 8190:8090 |
+
+### Testing Tools
+| No    | Tools                 | Purpose   | Website   | Port Mapping  |
+| --    | -----                 | -------   | -------   | ------------  |
+| 1     | Selenium              | Open source for automation testing across browser for web applications | https://www.selenium.dev/ | 4442, 4443, 4444 |
 <br />
 
 ## Prerequisites

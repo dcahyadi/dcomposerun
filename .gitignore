@@ -9,6 +9,7 @@ elasticsearch/
 jenkins/
 mongo/
 mysql/
+mysql-workbench/
 nginx/
 pgadmin/
 portainer-data/

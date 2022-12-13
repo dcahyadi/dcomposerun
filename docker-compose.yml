@@ -39,6 +39,9 @@
 # ==============
 # 1.  OWASP ZAP           8180:8080, 8190:8090
 
+# TESTING TOOLS
+# ==============
+# 1.  Selenium            4442, 4443, 4444
 
 version: '3'
 
@@ -85,7 +88,7 @@ services:
       - PGID=1000
       - TZ=Asia/Jakarta
     volumes:
-      - /path/to/config:/config
+      - ./mysql-workbench/config:/config
     ports:
       - 3000:3000
     networks:
@@ -432,6 +435,7 @@ services:
       static-network:
         ipv4_address: 172.20.0.54
 
+
   # 1. OWASP Zed Attack Proxy (ZAP)
   zaproxy:
     image: owasp/zap2docker-stable
@@ -444,6 +448,71 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.101
+
+
+  # 1. Selenium Hub
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    restart: unless-stopped
+    ports:
+      - 4442:4442
+      - 4443:4443
+      - 4444:4444
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.121
+  # 1a. Selenium Node Chrome
+  selenium-chrome:
+    image: selenium/node-chrome:latest
+    container_name: selenium-node-chrome
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=1
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_SESSION_TIMEOUT=10
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.122
+  # 1b. Selenium Node Firefox
+  selenium-firefox:
+    image: selenium/node-firefox:latest
+    container_name: selenium-node-firefox
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=1
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_SESSION_TIMEOUT=10
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.123
+  # 1c. Selenium Node Edge
+  selenium-edge:
+    image: selenium/node-edge:latest
+    container_name: selenium-node-edge
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_INSTANCES=1
+      - SE_NODE_MAX_SESSIONS=1
+      - SE_NODE_SESSION_TIMEOUT=10
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.124
 
 networks:
   static-network:
