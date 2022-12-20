@@ -35,15 +35,18 @@
 # 1.  Nginx               8080, 443
 # 2.  Jenkins Controller  8083:8080, 50001:50000
 # 3.  Jenkins Agent       22
-# 4.  Atlassian Bamboo    8085:8085
+# 4.  Atlassian Bamboo    8085
+# 5.  Kong                11000:8000, 11443:8443, 11001:8001, 11444:8444
+# 6.  Konga               1337
 
 # SECURITY TOOLS
 # ==============
 # 1.  OWASP ZAP           8180:8080, 8190:8090
 
-# TESTING TOOLS
-# ==============
-# 1.  Selenium            4442, 4443, 4444
+# QA & TESTING TOOLS
+# ==================
+# 1.  Sonarqube           9002:9000
+# 2.  Selenium            4442, 4443, 4444
 
 version: '3'
 
@@ -103,13 +106,15 @@ services:
     image: postgres:15.1
     container_name: postgresql
     restart: unless-stopped
+    command: ["postgres", "-c", "logging_collector=on", "-c", "log_statement=all"]
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=P4ssword2050
       #- POSTGRES_DB=testdb
-      - POSTGRES_MULTIPLE_DATABASES=testdb:P4ssword2050,sonar:P4ssword2050  #username+dbname:password
+      - POSTGRES_MULTIPLE_DATABASES=testdb:P4ssword2050,sonar:P4ssword2050,kong:P4ssword2050, #username+dbname:password
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/logs:/var/log/postgresql/
       - ./media/postgre-initdb/init_multi_db.sh:/docker-entrypoint-initdb.d/init_multi_db.sh
     ports:
       - 5432:5432
@@ -438,28 +443,91 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.54
-  # 5. Sonarqube
-  sonarqube:
-    image: sonarqube:lts-community
-    container_name: sonarqube-celts
-    restart: unless-stopped
+  # 5a. Kong Migration
+  kong-migration:
+    image: kong:latest
+    container_name: kong-migration
+    restart: on-failure
+    command: kong migrations bootstrap
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=172.20.0.5
+      - KONG_PG_DATABASE=kong
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=P4ssword2050
     depends_on:
       - postgresql
-    environment:
-      - SONAR_JDBC_URL=jdbc:postgresql://172.20.0.5:5432/sonar
-      - SONAR_JDBC_USERNAME=postgres
-      - SONAR_JDBC_PASSWORD=P4ssword2050
-      - JVM_OPTS=-Xmx1g -Xms1g -XX:MaxPermSize=1024m
-    volumes:
-      - ./sonarqube/conf:/opt/sonarqube/conf
-      - ./sonarqube/data:/opt/sonarqube/data
-      - ./sonarqube/extensions:/opt/sonarqube/extensions
-      - ./sonarqube/logs:/opt/sonarqube/logs
-    ports:
-      - 9002:9000
     networks:
       static-network:
         ipv4_address: 172.20.0.55
+  # 5b. Kong
+  kong:
+    image: kong:latest
+    container_name: kong
+    restart: unless-stopped
+    environment:
+      - KONG_LOG_LEVEL=debug
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=172.20.0.5
+      - KONG_PG_DATABASE=kong
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=P4ssword2050
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_PROXY_LISTEN=0.0.0.0:8000
+      - KONG_PROXY_LISTEN_SSL=0.0.0.0:8443
+    ports:
+      - 11000:8000
+      - 11443:8443
+      - 11001:8001
+      - 11444:8444
+    depends_on:
+      - kong-migration
+      - postgresql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11001"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.56
+  # 6a. Konga prepare
+  konga-prepare:
+    image: pantsel/konga:latest
+    container_name: konga-prepare
+    command: "-c prepare -a postgres -u postgresql://kong:P4ssword2050@172.20.0.5:5432/kong"
+    restart: on-failure
+    depends_on:
+      - postgresql
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.57
+  # 6b. Konga
+  konga:
+    image: pantsel/konga:latest
+    container_name: konga
+    restart: on-failure
+    environment:
+      - TOKEN_SECRET=xnpgDd3nAZ7hcokmEvRWGXGP6aWt8Mh5
+      - DB_ADAPTER=postgres
+      - DB_HOST=172.20.0.5
+      - DB_PORT=5432
+      - DB_DATABASE=kong
+      - DB_USER=kong
+      - DB_PASSWORD=P4ssword2050
+      - NODE_ENV=development # development / production
+      - KONGA_HOOK_TIMEOUT=10000
+    ports:
+      - 1337:1337
+    depends_on:
+      - postgresql
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.58
 
 
   # 1. OWASP Zed Attack Proxy (ZAP)
@@ -476,7 +544,29 @@ services:
         ipv4_address: 172.20.0.101
 
 
-  # 1. Selenium Hub
+  # 1. Sonarqube
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube-celts
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://172.20.0.5:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=P4ssword2050
+      - JVM_OPTS=-Xmx1g -Xms1g -XX:MaxPermSize=1024m
+    volumes:
+      - ./sonarqube/conf:/opt/sonarqube/conf
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/logs:/opt/sonarqube/logs
+    ports:
+      - 9002:9000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.121
+  # 2. Selenium Hub
   selenium-hub:
     image: selenium/hub:latest
     container_name: selenium-hub
@@ -487,8 +577,8 @@ services:
       - 4444:4444
     networks:
       static-network:
-        ipv4_address: 172.20.0.121
-  # 1a. Selenium Node Chrome
+        ipv4_address: 172.20.0.122
+  # 2a. Selenium Node Chrome
   selenium-chrome:
     image: selenium/node-chrome:latest
     container_name: selenium-node-chrome
@@ -504,8 +594,8 @@ services:
       - SE_NODE_SESSION_TIMEOUT=10
     networks:
       static-network:
-        ipv4_address: 172.20.0.122
-  # 1b. Selenium Node Firefox
+        ipv4_address: 172.20.0.123
+  # 2b. Selenium Node Firefox
   selenium-firefox:
     image: selenium/node-firefox:latest
     container_name: selenium-node-firefox
@@ -521,8 +611,8 @@ services:
       - SE_NODE_SESSION_TIMEOUT=10
     networks:
       static-network:
-        ipv4_address: 172.20.0.123
-  # 1c. Selenium Node Edge
+        ipv4_address: 172.20.0.124
+  # 2c. Selenium Node Edge
   selenium-edge:
     image: selenium/node-edge:latest
     container_name: selenium-node-edge
@@ -538,7 +628,7 @@ services:
       - SE_NODE_SESSION_TIMEOUT=10
     networks:
       static-network:
-        ipv4_address: 172.20.0.124
+        ipv4_address: 172.20.0.125
 
 networks:
   static-network:

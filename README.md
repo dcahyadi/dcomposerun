@@ -38,17 +38,19 @@ Purpose of this project is to accelarate preparation of sharing resource server 
 | 2     | Jenkins Controller    | Node for Jenkins Server (an automated server which related to build, test, and deploy code) | https://www.jenkins.io | 8083:8080, 50001:50000 |
 | 3     | Jenkins Agent         | Node to run build tasks that are scheduled by the Jenkins Controller | https://www.jenkins.io | 22 |
 | 4     | Atlassian Bamboo      | CI/CD tool, used for automated build, test, and deploy | https://www.atlassian.com/software/bamboo | 8085:8085 |
-| 5     | Sonarqube             | Code Quality Assurance tool to inspect code quality and security | https://www.sonarqube.org | 9002:9000 |
+| 5     | Kong                  | Open Source API Gateway | https://konghq.com | 11000:8000, 11443:8443, 11001:8001, 11444:8444 |
+| 6     | Konga                 | GUI Open Source for Kong Management | https://pantsel.github.io/konga | 1337 |
 
 ### Security Tools
 | No    | Tools                   | Purpose   | Website   | Port Mapping  |
 | --    | -----                   | -------   | -------   | ------------  |
 | 1     | Zed Attack Proxy (ZAP)  | Open source web application security scanner | https://www.zaproxy.org | 8180:8080, 8190:8090 |
 
-### Testing Tools
+### Quality Assurance and Testing Tools
 | No    | Tools                 | Purpose   | Website   | Port Mapping  |
 | --    | -----                 | -------   | -------   | ------------  |
-| 1     | Selenium              | Open source for automation testing across browser for web applications | https://www.selenium.dev | 4442, 4443, 4444 |
+| 1     | Sonarqube             | Code Quality Assurance tool to inspect code quality and security | https://www.sonarqube.org | 9002:9000 |
+| 2     | Selenium              | Open source for automation testing across browser for web applications | https://www.selenium.dev | 4442, 4443, 4444 |
 <br />
 
 ## Prerequisites

@@ -13,6 +13,9 @@ function create_databases() {
       CREATE USER $database with encrypted password '$password';
       CREATE DATABASE $database;
       GRANT ALL PRIVILEGES ON DATABASE $database TO $database;
+      GRANT ALL ON SCHEMA public TO $database;
+      GRANT ALL ON DATABASE $database TO $database;
+      ALTER DATABASE $database OWNER TO $database;
 EOSQL
 }
 
