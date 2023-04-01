@@ -8,6 +8,7 @@ db2/
 elasticsearch/
 jenkins/
 mongo/
+mssql/
 mysql/
 mysql-workbench/
 nginx/

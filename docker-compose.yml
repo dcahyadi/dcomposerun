@@ -8,6 +8,8 @@
 # sudo chmod -R 775 ./elasticsearch/
 # Sonarqube:
 # sudo sysctl -w vm.max_map_count=262144
+# OracleDB
+# login to: container-registry.oracle.com
 
 # DEVELOPMENT TOOLS
 # =================
@@ -29,6 +31,8 @@
 # 16. Kibana              5601
 # 17. RabbitMQ            5672, 15672
 # 18. Keycloak            8084:8080
+# 19. MS SQL Server       1433:1433
+# 20. Oracle DB           1521:1521
 
 # DEVOPS TOOLS
 # ============
@@ -380,6 +384,35 @@ services:
     networks:
       static-network:
         ipv4_address: 172.20.0.19
+  # 19. MS SQL Server
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    container_name: mssql
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=P4ssword2050
+    volumes:
+      - ./mssql:/var/opt/mssql
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.20
+  # 20. Oracle DB
+  # oracledb:
+  #   image: container-registry.oracle.com/database/standard
+  #   container_name: oracledb
+  #   shm_size: 4g
+  #   environment:
+  #     DB_SID: OraSID
+  #     DB_PASSWD: P4ssword2050
+  #     DB_DOMAIN: my.domain.com
+  #     DB_BUNDLE: basic
+  #   ports:
+  #     - 1521:1521
+  #   networks:
+  #     static-network:
+  #       ipv4_address: 172.20.0.21
 
 
   # 1. Nginx
@@ -487,11 +520,6 @@ services:
     depends_on:
       - kong-migration
       - postgresql
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11001"]
-      interval: 5s
-      timeout: 2s
-      retries: 15
     networks:
       static-network:
         ipv4_address: 172.20.0.56

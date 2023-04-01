@@ -30,6 +30,8 @@ Purpose of this project is to accelarate preparation of sharing resource server 
 | 16    | Kibana                | Data visualization dashboard for Elasticsearch | https://www.elastic.co/kibana | 5601 |
 | 17    | RabbitMQ              | Open source message-broker that implemented AMQP | https://www.rabbitmq.com | 5672, 15672 |
 | 18    | Keycloak              | Open source SSO software with Identity and Access Management | https://www.keycloak.org | 8084:8080 |
+| 19    | Ms SQL Server         | Relational database management system developed by Microsoft | https://www.microsoft.com/en-us/sql-server | 1433:1433 |
+| 20    | OracleDB              | Multi-modle database management system produced and marketed by Oracle Corp. | https://www.oracle.com/database/ | 1521:1521 |
 
 ### DevOps Tools
 | No    | Tools                 | Purpose   | Website   | Port Mapping  |
@@ -76,10 +78,18 @@ These are software that needs to be installed before use:
   ```sh
   docker-compose up -d
   ```
+  Or use this command
+  ```sh
+  bash ./dcomposer_start.sh
+  ```
 * Command to stop all services
   ```sh
   docker-compose down
   ```
+  Or use this command
+  ```sh
+  bash ./dcomposer_stop.sh
+
 * Command for update docker images
   ```sh
   docker-compose pull
